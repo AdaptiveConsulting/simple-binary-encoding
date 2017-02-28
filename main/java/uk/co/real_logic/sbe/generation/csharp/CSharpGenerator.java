@@ -811,11 +811,15 @@ public class CSharpGenerator implements CodeGenerator
                 indent + "    public void Set%1$s(byte[] src, int srcOffset)\n" +
                 indent + "    {\n" +
                 indent + "        const int length = %2$d;\n" +
-                indent + "        if (srcOffset < 0 || srcOffset > (src.Length - length))\n" +
+                indent + "        if (srcOffset < 0 || srcOffset > src.Length)\n" +
                 indent + "        {\n" +
                 indent + "            throw new IndexOutOfRangeException(\"srcOffset out of range for copy: offset=\" + srcOffset);\n" +
                 indent + "        }\n\n" +
-                indent + "        _buffer.SetBytes(_offset + %3$d, src, srcOffset, length);\n" +
+                indent + "        if (src.Length > length)\n" +
+                indent + "        {\n" +
+                indent + "            throw new ArgumentOutOfRangeException($\"src.Length={src.Length} is too large.\");\n" +
+                indent + "        }\n\n" +
+                indent + "        _buffer.SetBytes(_offset + %3$d, src, srcOffset, src.Length - srcOffset);\n" +
                 indent + "    }\n",
                 propName,
                 fieldLength,
